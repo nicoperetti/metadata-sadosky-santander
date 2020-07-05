@@ -147,7 +147,7 @@ def valid(model, testing_loader):
 for epoch in range(EPOCHS):
     train(epoch)
     y_t, y_p, acc = valid(model, training_loader)
-	print("Accuracy on test data = %0.2f%%" % acc)
+    print("Accuracy on test data = %0.2f%%" % acc)
 
 
 output_model_file = './pytorch_beto_news_clean.bin'
