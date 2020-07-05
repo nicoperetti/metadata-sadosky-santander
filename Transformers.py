@@ -29,7 +29,7 @@ NB_CLASS = len(encode_dict)
 MAX_LEN = 512
 TRAIN_BATCH_SIZE = 16
 VALID_BATCH_SIZE = 16
-EPOCHS = 5
+EPOCHS = 20
 LEARNING_RATE = 1e-05
 tokenizer = AutoTokenizer.from_pretrained("dccuchile/bert-base-spanish-wwm-cased")
 
@@ -66,21 +66,32 @@ class Triage(Dataset):
     def __len__(self):
         return self.len
 
+
+train_index, test_index = train_test_split(list(df.index), random_state = 13571113)
 # Creating the dataset and dataloader for the neural network
-train_dataset=df.reset_index().drop(columns="index")
+train_dataset=df.iloc[train_index].reset_index().drop(columns="index")
+test_dataset=df.iloc[test_index].reset_index().drop(columns="index")
 
 print("FULL Dataset: {}".format(df.shape))
-
+print("TRAIN Dataset: {}".format(train_dataset.shape))
+print("TEST Dataset: {}".format(test_dataset.shape))
 
 training_set = Triage(train_dataset, tokenizer, MAX_LEN)
+testing_set = Triage(test_dataset, tokenizer, MAX_LEN)
+
 
 train_params = {'batch_size': TRAIN_BATCH_SIZE,
                 'shuffle': True,
                 'num_workers': 0
                 }
 
+test_params = {'batch_size': VALID_BATCH_SIZE,
+                'shuffle': True,
+                'num_workers': 0
+                }
 
 training_loader = DataLoader(training_set, **train_params)
+testing_loader = DataLoader(testing_set, **test_params)
 
 
 class BERTClass(torch.nn.Module):
@@ -141,13 +152,23 @@ def valid(model, testing_loader):
             n_correct+=(big_idx==targets).sum().item()
             y_true += targets
             y_pred += big_idx
-    return y_true, y_pred, (n_correct*100.0)/total
+    y_true = [y.cpu().numpy().tolist() for y in y_true]
+    y_pred = [y.cpu().numpy().tolist() for y in y_pred]
+    accc = accuracy_score(y_true, y_pred)
+    bacc = balanced_accuracy_score(y_true, y_pred)
+    return accc, bacc, (n_correct*100.0)/total
 
 
 for epoch in range(EPOCHS):
     train(epoch)
-    y_t, y_p, acc = valid(model, training_loader)
-    print("Accuracy on test data = %0.2f%%" % acc)
+    accc, bacc, acc = valid(model, training_loader)
+    print("Accuracy on Train data = %0.2f%%" % acc)
+    print("Accuracy on Train data = %0.2f%%" % accc)
+    print("Balanced Accuracy on Train data = %0.2f%%" % bacc)
+    accc, bacc, acc = valid(model, testing_loader)
+    print("Accuracy on Train data = %0.2f%%" % acc)
+    print("Accuracy on Train data = %0.2f%%" % accc)
+    print("Balanced Accuracy on Train data = %0.2f%%" % bacc)
 
 
 output_model_file = './pytorch_beto_news_clean.bin'
