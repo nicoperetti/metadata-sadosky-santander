@@ -18,9 +18,9 @@ EPOCHS = 20
 LEARNING_RATE = 1e-05
 
 
-def load_data(input_path='data/train_clean.csv'):
+def load_data(input_path='data/train_clean.csv', columns_Q='clean_txt'):
     df = pd.read_csv(input_path)
-    df = df[['clean_txt', 'Intencion']]
+    df = df[[columns_Q, 'Intencion']]
     df.columns = ['Pregunta', 'Intencion']
 
     encode_dict = {}
