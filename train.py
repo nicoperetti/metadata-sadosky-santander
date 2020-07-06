@@ -46,8 +46,8 @@ def get_loaders(df, tokenizer, validation):
     return training_loader, testing_loader
 
 
-def evaluate(model, device, data_loader, validation):
-    if not validation:
+def evaluate(model, device, data_loader):
+    if data_loader is None:
         print("Not validation Data")
         return
     model.eval()
@@ -110,8 +110,8 @@ def train(df, nb_class, output_model_file, output_vocab_file, validation):
             loss.backward()
             optimizer.step()
 
-        evaluate(model, device, training_loader, validation)
-        evaluate(model, device, testing_loader, validation)
+        evaluate(model, device, training_loader)
+        evaluate(model, device, testing_loader)
 
     torch.save(model, output_model_file)
     tokenizer.save_vocabulary(output_vocab_file)
