@@ -1,5 +1,23 @@
+import pandas as pd
 import torch
 from torch.utils.data import Dataset
+
+
+def load_data(input_path='data/train_clean.csv', columns_Q='clean_txt'):
+    df = pd.read_csv(input_path)
+    df = df[[columns_Q, 'Intencion']]
+    df.columns = ['Pregunta', 'Intencion']
+
+    encode_dict = {}
+
+    def encode_cat(x):
+        if x not in encode_dict.keys():
+            encode_dict[x] = len(encode_dict)
+        return encode_dict[x]
+
+    df['ENCODE_CAT'] = df['Intencion'].apply(lambda x: encode_cat(x))
+    NB_CLASS = len(encode_dict)
+    return df, encode_dict, NB_CLASS
 
 
 class Triage(Dataset):

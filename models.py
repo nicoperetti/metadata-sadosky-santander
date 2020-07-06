@@ -1,5 +1,10 @@
 import torch
-from transformers import AutoModelWithLMHead
+from transformers import AutoModelWithLMHead, AutoTokenizer
+
+
+def load_tokenizer():
+    tokenizer = AutoTokenizer.from_pretrained("dccuchile/bert-base-spanish-wwm-cased")
+    return tokenizer
 
 
 class BERTClass(torch.nn.Module):

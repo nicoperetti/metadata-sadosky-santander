@@ -2,13 +2,12 @@
 # coding: utf-8
 from torch.utils.data import DataLoader
 import torch
-import pandas as pd
-from transformers import AutoTokenizer
+import json
 from sklearn.metrics import balanced_accuracy_score
 from sklearn.model_selection import train_test_split
 
-from dataset import Triage
-from models import BERTClass
+from dataset import Triage, load_data
+from models import BERTClass, load_tokenizer
 
 # Defining some key variables that will be used later on in the training
 MAX_LEN = 512
@@ -16,28 +15,6 @@ TRAIN_BATCH_SIZE = 16
 VALID_BATCH_SIZE = 16
 EPOCHS = 20
 LEARNING_RATE = 1e-05
-
-
-def load_data(input_path='data/train_clean.csv', columns_Q='clean_txt'):
-    df = pd.read_csv(input_path)
-    df = df[[columns_Q, 'Intencion']]
-    df.columns = ['Pregunta', 'Intencion']
-
-    encode_dict = {}
-
-    def encode_cat(x):
-        if x not in encode_dict.keys():
-            encode_dict[x] = len(encode_dict)
-        return encode_dict[x]
-
-    df['ENCODE_CAT'] = df['Intencion'].apply(lambda x: encode_cat(x))
-    NB_CLASS = len(encode_dict)
-    return df, encode_dict, NB_CLASS
-
-
-def load_tokenizer():
-    tokenizer = AutoTokenizer.from_pretrained("dccuchile/bert-base-spanish-wwm-cased")
-    return tokenizer
 
 
 def get_loaders(df, tokenizer, validation):
@@ -143,6 +120,7 @@ def train(df, nb_class, output_model_file, output_vocab_file, validation):
 
 if __name__ == "__main__":
     df, encode_dict, nb_class = load_data(input_path='data/train_clean.csv')
+    json.dump(encode_dict, open("./clean_text/mapping.json", "w"))
     train(df,
           nb_class,
           validation=True,
