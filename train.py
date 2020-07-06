@@ -81,7 +81,7 @@ def evaluate(model, device, data_loader, validation):
 def train(df, nb_class, output_model_file, output_vocab_file, validation):
     tokenizer = load_tokenizer()
 
-    training_loader, testing_loader = get_loaders(df, validation)
+    training_loader, testing_loader = get_loaders(df, tokenizer, validation)
 
     device = 'cuda'  # 'cpu'
     model = BERTClass(nb_class)
