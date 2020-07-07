@@ -21,11 +21,12 @@ def load_data(input_path='data/train_clean.csv', columns_Q='clean_txt'):
 
 
 class Triage(Dataset):
-    def __init__(self, dataframe, tokenizer, max_len):
+    def __init__(self, dataframe, tokenizer, max_len, mode="train"):
         self.len = len(dataframe)
         self.data = dataframe
         self.tokenizer = tokenizer
         self.max_len = max_len
+        self.mode = mode
 
     def __getitem__(self, index):
         pregunta = str(self.data.Pregunta[index])
@@ -43,12 +44,12 @@ class Triage(Dataset):
         mask = inputs['attention_mask']
         token_type_ids = inputs["token_type_ids"]
 
-        return {
-            'ids': torch.tensor(ids, dtype=torch.long),
-            'mask': torch.tensor(mask, dtype=torch.long),
-            'token_type_ids': torch.tensor(token_type_ids, dtype=torch.long),
-            'targets': torch.tensor(self.data.ENCODE_CAT[index], dtype=torch.long)
-        }
+        d = {'ids': torch.tensor(ids, dtype=torch.long),
+             'mask': torch.tensor(mask, dtype=torch.long),
+             'token_type_ids': torch.tensor(token_type_ids, dtype=torch.long)}
+        col_target = "id" if self.mode == "submit" else "ENCODE_CAT"
+        d['targets'] = torch.tensor(self.data[col_target][index], dtype=torch.long)
+        return d
 
     def __len__(self):
         return self.len
