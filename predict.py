@@ -45,8 +45,7 @@ if __name__ == "__main__":
     encode_dict_inv = {v: k for k, v in encode_dict.items()}
 
     tokenizer = load_tokenizer()
-    map_location = torch.device(device)
-    model = torch.load("clean_text/pytorch_beto_news.bin", map_location=map_location)
+    model = torch.load("clean_text/pytorch_beto_news.bin")
 
     test_set = Triage(df, tokenizer, MAX_LEN, mode="submit")
     test_params = {'batch_size': VALID_BATCH_SIZE,
