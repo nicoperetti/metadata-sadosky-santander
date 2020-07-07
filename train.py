@@ -119,10 +119,11 @@ def train(df, nb_class, output_model_file, output_vocab_file, validation):
 
 
 if __name__ == "__main__":
+    output_path = "./clean_text_w"
     df, encode_dict, nb_class = load_data(input_path='data/train_clean.csv')
-    json.dump(encode_dict, open("./clean_text/mapping.json", "w"))
+    json.dump(encode_dict, open(output_path + "mapping.json", "w"))
     train(df,
           nb_class,
           validation=True,
-          output_model_file='./clean_text/pytorch_beto_news_clean.bin',
-          output_vocab_file='./clean_text/vocab_beto_news_clean.bin')
+          output_model_file=output_path + 'pytorch_beto_news.bin',
+          output_vocab_file=output_path + 'vocab_beto_news.bin')

@@ -32,9 +32,10 @@ def predict(model, data_loader, device):
 
 
 if __name__ == "__main__":
+    output_path = "./clean_text"
     input_path = 'data/test_santander_clean.csv'
     columns_Q = 'clean_txt'
-    mapping_dict = "./clean_text/mapping.json"
+    mapping_dict = output_path + "mapping.json"
     device = "cuda"
 
     df = pd.read_csv(input_path)
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     encode_dict_inv = {v: k for k, v in encode_dict.items()}
 
     tokenizer = load_tokenizer()
-    model = torch.load("clean_text/pytorch_beto_news.bin")
+    model = torch.load(ooutput_path + "pytorch_beto_news_clean.bin")
 
     test_set = Triage(df, tokenizer, MAX_LEN, mode="submit")
     test_params = {'batch_size': VALID_BATCH_SIZE,
@@ -56,4 +57,4 @@ if __name__ == "__main__":
     id_list, preds = predict(model, test_loader, device)
     preds = [int(encode_dict_inv[pred].split("_")[1]) for pred in preds]
     df_submit = pd.DataFrame(list(zip(id_list, preds)))
-    df_submit.to_csv("clean_text/submit_transfomer.csv", header=False, index=False)
+    df_submit.to_csv(output_path + "submit_transfomer.csv", header=False, index=False)
