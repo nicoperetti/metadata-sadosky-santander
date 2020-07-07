@@ -1,9 +1,10 @@
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
+from collections import Counter
 
 
-def load_data(input_path='data/train_clean.csv', columns_Q='clean_txt'):
+def load_data(input_path='data/train_clean.csv', columns_Q='clean_txt', weight=False):
     df = pd.read_csv(input_path)
     df = df[[columns_Q, 'Intencion']]
     df.columns = ['Pregunta', 'Intencion']
@@ -17,8 +18,13 @@ def load_data(input_path='data/train_clean.csv', columns_Q='clean_txt'):
 
     df['ENCODE_CAT'] = df['Intencion'].apply(lambda x: encode_cat(x))
     NB_CLASS = len(encode_dict)
-    return df, encode_dict, NB_CLASS
+    
+    weight_list = None
+    if weight:
+        class_counter = Counter(df['ENCODE_CAT'])
+        weight_list = [1 / class_counter[i] for i in range(NB_CLASS)]
 
+    return df, encode_dict, NB_CLASS, weight_list
 
 class Triage(Dataset):
     def __init__(self, dataframe, tokenizer, max_len, mode="train"):

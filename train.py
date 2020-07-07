@@ -78,7 +78,7 @@ def evaluate(model, device, data_loader):
         print("Balanced Accuracy: %0.2f%%" % bacc)
 
 
-def train(df, nb_class, output_model_file, output_vocab_file, validation):
+def train(df, nb_class, output_model_file, output_vocab_file, validation, weight_list):
     tokenizer = load_tokenizer()
 
     training_loader, testing_loader = get_loaders(df, tokenizer, validation)
@@ -87,7 +87,13 @@ def train(df, nb_class, output_model_file, output_vocab_file, validation):
     model = BERTClass(nb_class)
     model.to(device)
 
-    loss_function = torch.nn.CrossEntropyLoss()
+    if weight_list is not None:
+        print("CrossEntropyLoss loss with weights")
+        weights = torch.FloatTensor(weight_list).to(device, dtype=torch.float)
+        loss_function = torch.nn.CrossEntropyLoss(weight=weights)
+    else:
+        print("CrossEntropyLoss")
+        loss_function = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(params=model.parameters(), lr=LEARNING_RATE)
 
     for epoch in range(EPOCHS):
@@ -120,10 +126,11 @@ def train(df, nb_class, output_model_file, output_vocab_file, validation):
 
 if __name__ == "__main__":
     output_path = "./clean_text_w"
-    df, encode_dict, nb_class = load_data(input_path='data/train_clean.csv')
+    df, encode_dict, nb_class, weight_list = load_data(input_path='data/train_clean.csv', weight=True)
     json.dump(encode_dict, open(output_path + "mapping.json", "w"))
     train(df,
           nb_class,
           validation=True,
           output_model_file=output_path + 'pytorch_beto_news.bin',
-          output_vocab_file=output_path + 'vocab_beto_news.bin')
+          output_vocab_file=output_path + 'vocab_beto_news.bin',
+          weight_list=weight_list)
