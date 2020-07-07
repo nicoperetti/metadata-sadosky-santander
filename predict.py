@@ -32,7 +32,7 @@ def predict(model, data_loader, device):
 
 
 if __name__ == "__main__":
-    output_path = "./clean_text"
+    output_path = "./clean_text/"
     input_path = 'data/test_santander_clean.csv'
     columns_Q = 'clean_txt'
     mapping_dict = output_path + "mapping.json"
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     encode_dict_inv = {v: k for k, v in encode_dict.items()}
 
     tokenizer = load_tokenizer()
-    model = torch.load(ooutput_path + "pytorch_beto_news_clean.bin")
+    model = torch.load(output_path + "pytorch_beto_news_clean.bin")
 
     test_set = Triage(df, tokenizer, MAX_LEN, mode="submit")
     test_params = {'batch_size': VALID_BATCH_SIZE,

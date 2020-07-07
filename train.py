@@ -119,13 +119,19 @@ def train(df, nb_class, output_model_file, output_vocab_file, validation, weight
         evaluate(model, device, training_loader)
         evaluate(model, device, testing_loader)
 
+        # checkpoint
+        if epoch % 5 == 0:
+            model_file = "/".join(output_model_file.split("/")[:-1]) + 'model_{:04d}.pth'.format(epoch)
+            torch.save(model, model_file)
+            print('checkpoint saved to {}'.format(model_file))
+
     torch.save(model, output_model_file)
     tokenizer.save_vocabulary(output_vocab_file)
     print('All files saved')
 
 
 if __name__ == "__main__":
-    output_path = "./clean_text_w"
+    output_path = "./clean_text_w/"
     df, encode_dict, nb_class, weight_list = load_data(input_path='data/train_clean.csv', weight=True)
     json.dump(encode_dict, open(output_path + "mapping.json", "w"))
     train(df,
