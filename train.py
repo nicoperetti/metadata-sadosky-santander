@@ -121,7 +121,7 @@ def train(df, nb_class, output_model_file, output_vocab_file, validation, weight
 
         # checkpoint
         if epoch % 5 == 0:
-            model_file = "/".join(output_model_file.split("/")[:-1]) + 'model_{:04d}.pth'.format(epoch)
+            model_file = "/".join(output_model_file.split("/")[:-1]) + '/model_{:04d}.pth'.format(epoch)
             torch.save(model, model_file)
             print('checkpoint saved to {}'.format(model_file))
 
@@ -134,7 +134,7 @@ if __name__ == "__main__":
     output_dir = "./translations_en_fr_w/"
     input_path = "data/train_with_translations_clean.csv",
     output_path = "data/train_with_translations_clean_all_es_en_fr.csv"
-    gather_translations(input_path, output_path)
+    gather_translations(input_path, output_path, option="weight")
     df, encode_dict, nb_class, weight_list = load_data(input_path=output_path,
                                                        weight=True)
     json.dump(encode_dict, open(output_dir + "mapping.json", "w"))
