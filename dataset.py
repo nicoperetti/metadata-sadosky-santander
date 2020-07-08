@@ -18,13 +18,27 @@ def load_data(input_path='data/train_clean.csv', columns_Q='clean_txt', weight=F
 
     df['ENCODE_CAT'] = df['Intencion'].apply(lambda x: encode_cat(x))
     NB_CLASS = len(encode_dict)
-    
+
     weight_list = None
     if weight:
         class_counter = Counter(df['ENCODE_CAT'])
         weight_list = [1 / class_counter[i] for i in range(NB_CLASS)]
 
     return df, encode_dict, NB_CLASS, weight_list
+
+
+def gather_translations(input_path="data/train_with_translations_clean.csv",
+                        output_path="data/train_with_translations_clean_all_es_en_fr.csv"):
+    df = pd.read_csv(input_path)
+    columns = ["clean_txt", "clean_txt_T1", "clean_txt_T2_fr"]
+    df_list = []
+    for col in columns:
+        asd = df[[col, "Intencion"]]
+        asd.columns = ["clean_txt", "Intencion"]
+        df_list.append(asd)
+    train = pd.concat(df_list)
+    train.to_csv(output_path, index=False)
+
 
 class Triage(Dataset):
     def __init__(self, dataframe, tokenizer, max_len, mode="train"):
