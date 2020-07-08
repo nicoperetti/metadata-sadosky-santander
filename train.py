@@ -131,16 +131,16 @@ def train(df, nb_class, output_model_file, output_vocab_file, validation, weight
 
 
 if __name__ == "__main__":
-    output_path = "./translations_en_fr_w/"
+    output_dir = "./translations_en_fr_w/"
     input_path = "data/train_with_translations_clean.csv",
     output_path = "data/train_with_translations_clean_all_es_en_fr.csv"
     gather_translations(input_path, output_path)
     df, encode_dict, nb_class, weight_list = load_data(input_path=output_path,
                                                        weight=True)
-    json.dump(encode_dict, open(output_path + "mapping.json", "w"))
+    json.dump(encode_dict, open(output_dir + "mapping.json", "w"))
     train(df,
           nb_class,
           validation=True,
-          output_model_file=output_path + 'pytorch_beto_news.bin',
-          output_vocab_file=output_path + 'vocab_beto_news.bin',
+          output_model_file=output_dir + 'pytorch_beto_news.bin',
+          output_vocab_file=output_dir + 'vocab_beto_news.bin',
           weight_list=weight_list)
