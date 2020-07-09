@@ -1,5 +1,7 @@
 import json
 import pandas as pd
+import numpy as np
+from scipy import stats
 import torch
 from dataset import Triage
 from torch.utils.data import DataLoader
@@ -33,14 +35,11 @@ def predict(model, data_loader, device):
 
 if __name__ == "__main__":
     output_path = "./translations_en_fr_w/"
-    input_path = 'data/test_santander_clean.csv'
-    columns_Q = 'clean_txt'
+    input_path = 'data/test_with_translations_clean.csv'
     mapping_dict = output_path + "mapping.json"
     device = "cuda"
 
     df = pd.read_csv(input_path)
-    df = df[['id', columns_Q]]
-    df.columns = ["id", "Pregunta"]
 
     encode_dict = json.load(open(mapping_dict, "r"))
     encode_dict_inv = {v: k for k, v in encode_dict.items()}
@@ -48,13 +47,26 @@ if __name__ == "__main__":
     tokenizer = load_tokenizer()
     model = torch.load(output_path + "pytorch_beto_news.bin")
 
-    test_set = Triage(df, tokenizer, MAX_LEN, mode="submit")
-    test_params = {'batch_size': VALID_BATCH_SIZE,
-                   'shuffle': False,
-                   'num_workers': 0}
-    test_loader = DataLoader(test_set, **test_params)
+    # Test Time Data Augmentation.
+    preds_list = []
+    id_list = []
+    columns = ['clean_txt', 'clean_txt_T1', 'clean_txt_T2_fr', 'clean_txt_T3_pt', 'clean_txt_T4_ar']
+    for col in columns:
+        df0 = df[['id', col]].copy()
+        df0.columns = ["id", "Pregunta"]
 
-    id_list, preds = predict(model, test_loader, device)
-    preds = [int(encode_dict_inv[pred].split("_")[1]) for pred in preds]
-    df_submit = pd.DataFrame(list(zip(id_list, preds)))
+        test_set = Triage(df0, tokenizer, MAX_LEN, mode="submit")
+        test_params = {'batch_size': VALID_BATCH_SIZE,
+                       'shuffle': False,
+                       'num_workers': 0}
+        test_loader = DataLoader(test_set, **test_params)
+
+        id_list, preds = predict(model, test_loader, device)
+        preds = [int(encode_dict_inv[pred].split("_")[1]) for pred in preds]
+        preds_list.append(preds)
+    preds_list = np.array(preds_list)
+    mode, counts = stats.mode(preds_list)
+    preds_list = list(mode[0])
+
+    df_submit = pd.DataFrame(list(zip(id_list, preds_list)))
     df_submit.to_csv(output_path + "submit_transfomer.csv", header=False, index=False)
