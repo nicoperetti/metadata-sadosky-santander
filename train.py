@@ -131,9 +131,9 @@ def train(df, nb_class, output_model_file, output_vocab_file, validation, weight
 
 
 if __name__ == "__main__":
-    output_dir = "./translations_en_fr_w/"
+    output_dir = "./translations_en_fr_pt_ar_w/"
     input_path = "data/train_with_translations_clean.csv"
-    output_path = "data/train_with_translations_clean_all_es_en_fr.csv"
+    output_path = "data/train_with_translations_clean_all_es_en_fr_pt_ar.csv"
     gather_translations(input_path, output_path, option="weight")
     df, encode_dict, nb_class, weight_list = load_data(input_path=output_path,
                                                        weight=True)
