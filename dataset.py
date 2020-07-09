@@ -30,7 +30,7 @@ def load_data(input_path='data/train_clean.csv', columns_Q='clean_txt', weight=F
 def gather_translations(input_path="data/train_with_translations_clean.csv",
                         output_path="data/train_with_translations_clean_all_es_en_fr.csv",
                         option=None):
-    columns_t = ["clean_txt_T1", "clean_txt_T2_fr"]
+    columns_t = ["clean_txt_T1", "clean_txt_T2_fr", "clean_txt_T3_pt", "clean_txt_T4_ar"]
 
     if option == "weight":
         df = pd.read_csv(input_path)
