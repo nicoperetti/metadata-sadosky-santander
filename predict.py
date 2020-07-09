@@ -51,6 +51,7 @@ if __name__ == "__main__":
     preds_list = []
     id_list = []
     columns = ['clean_txt', 'clean_txt_T1', 'clean_txt_T2_fr', 'clean_txt_T3_pt', 'clean_txt_T4_ar']
+    gold_idx = 0
     for col in columns:
         df0 = df[['id', col]].copy()
         df0.columns = ["id", "Pregunta"]
@@ -65,8 +66,15 @@ if __name__ == "__main__":
         preds = [int(encode_dict_inv[pred].split("_")[1]) for pred in preds]
         preds_list.append(preds)
     preds_list = np.array(preds_list)
-    mode, counts = stats.mode(preds_list)
-    preds_list = list(mode[0])
+    gold_preds = preds_list[gold_idx, :]
 
-    df_submit = pd.DataFrame(list(zip(id_list, preds_list)))
-    df_submit.to_csv(output_path + "submit_transfomer.csv", header=False, index=False)
+    mode, counts = stats.mode(preds_list)
+    final_preds = mode[0]
+    counts = counts[0]
+    to_gold_idxs = list(np.argwhere(counts == 1).reshape(1, -1)[0])
+    final_preds[to_gold_idxs] = gold_preds[to_gold_idxs]
+
+    df_submit = pd.DataFrame(list(zip(id_list, list(preds_list))))
+    df_submit.to_csv(output_path + "submit_transfomer_TDA_5_gold.csv",
+                     header=False,
+                     index=False)
