@@ -80,7 +80,7 @@ def predict_script(input_path, output_dir, tdd):
     to_gold_idxs = list(np.argwhere(counts == 1).reshape(1, -1)[0])
     final_preds[to_gold_idxs] = gold_preds[to_gold_idxs]
 
-    df_submit = pd.DataFrame(list(zip(id_list, list(preds_list))))
+    df_submit = pd.DataFrame(list(zip(id_list, list(final_preds))))
     df_submit.to_csv(output_dir + "submit_transfomer_BETO.csv",
                      header=False,
                      index=False)
