@@ -1,0 +1,10 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.git
+clean*
+transla*
+exp*
+.eggs/
+*.ipynb
