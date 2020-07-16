@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+import click
 from torch.utils.data import DataLoader
 import torch
 import json
@@ -83,7 +84,7 @@ def train(df, nb_class, output_model_file, output_vocab_file, validation, weight
 
     training_loader, testing_loader = get_loaders(df, tokenizer, validation)
 
-    device = 'cuda'  # 'cpu'
+    device = 'cuda' if torch.cuda.is_available() else "cpu"
     model = BERTClass(nb_class)
     model.to(device)
 
@@ -130,10 +131,11 @@ def train(df, nb_class, output_model_file, output_vocab_file, validation, weight
     print('All files saved')
 
 
-if __name__ == "__main__":
-    output_dir = "./translations_en_fr_pt_ar_w/"
-    input_path = "data/train_with_translations_clean.csv"
-    output_path = "data/train_with_translations_clean_all_es_en_fr_pt_ar.csv"
+@click.command()
+@click.option('--input_path', type=click.STRING, help='Path to input file')
+@click.option('--output_dir', type=click.STRING, help='Path to output dir')
+def train_script(input_path, output_dir):
+    output_path = output_dir + "train_intermediate.csv"
     gather_translations(input_path, output_path, option="weight")
     df, encode_dict, nb_class, weight_list = load_data(input_path=output_path,
                                                        weight=True)
@@ -144,3 +146,7 @@ if __name__ == "__main__":
           output_model_file=output_dir + 'pytorch_beto_news.bin',
           output_vocab_file=output_dir + 'vocab_beto_news.bin',
           weight_list=weight_list)
+
+
+if __name__ == "__main__":
+    train_script()

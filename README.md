@@ -14,9 +14,8 @@ nvidia-docker run -v $(pwd):/meta/ -p <port>:<port> -it <image_name>:<image_tag>
 ## In order to run the jupyter notebooks:
 jupyter notebook --allow-root --ip=0.0.0.0 --port <port>
 
-## In order to run the pipelin:
-### This will pre-process the data, perform data augmentation, train the model and predict
-make all
+## In order to train BETO:
+make train predict
 
 ### To perform indiduals commands run:
 make help

@@ -53,8 +53,19 @@ translate_test:
 ## Translate
 translate: translate_train translate_test
 
-## All.
-all: pre_process back_translation train predict
+## Train
+train:
+	$(PYTHON_INTERPRETER) train.py \
+						--input_path "data/train_with_translation_clean.csv" \
+						--output_dir "transformer_out_dir/"
+
+## Predict
+predict:
+	$(PYTHON_INTERPRETER) predict.py \
+						--input_path "data/test_with_translation_clean.csv" \
+						--output_dir "transformer_out_dir/" \
+						--tdd False
+
 
 #################################################################################
 # Self Documenting Commands                                                     #

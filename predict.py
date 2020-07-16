@@ -1,3 +1,4 @@
+import click
 import json
 import pandas as pd
 import numpy as np
@@ -33,11 +34,13 @@ def predict(model, data_loader, device):
     return id_list, preds
 
 
-if __name__ == "__main__":
-    output_path = "./translations_en_fr_w/"
-    input_path = 'data/test_with_translations_clean.csv'
-    mapping_dict = output_path + "mapping.json"
-    device = "cuda"
+@click.command()
+@click.option('--input_path', type=click.STRING, help='Path to input file')
+@click.option('--output_dir', type=click.STRING, help='Path to output dir')
+@click.option('--tdd', type=click.BOOL, help='TDD: Test time Data Augmentation')
+def predict_script(input_path, output_dir, tdd):
+    mapping_dict = output_dir + "mapping.json"
+    device = 'cuda' if torch.cuda.is_available() else "cpu"
 
     df = pd.read_csv(input_path)
 
@@ -45,12 +48,15 @@ if __name__ == "__main__":
     encode_dict_inv = {v: k for k, v in encode_dict.items()}
 
     tokenizer = load_tokenizer()
-    model = torch.load(output_path + "pytorch_beto_news.bin")
+    model = torch.load(output_dir + "pytorch_beto_news.bin")
+    columns = ['clean_txt']
 
     # Test Time Data Augmentation.
+    if tdd:
+        columns += ['clean_txt_T1', 'clean_txt_T2_fr', 'clean_txt_T3_pt', 'clean_txt_T4_ar']
+
     preds_list = []
     id_list = []
-    columns = ['clean_txt', 'clean_txt_T1', 'clean_txt_T2_fr', 'clean_txt_T3_pt', 'clean_txt_T4_ar']
     gold_idx = 0
     for col in columns:
         df0 = df[['id', col]].copy()
@@ -75,6 +81,10 @@ if __name__ == "__main__":
     final_preds[to_gold_idxs] = gold_preds[to_gold_idxs]
 
     df_submit = pd.DataFrame(list(zip(id_list, list(preds_list))))
-    df_submit.to_csv(output_path + "submit_transfomer_TDA_5_gold.csv",
+    df_submit.to_csv(output_dir + "submit_transfomer_BETO.csv",
                      header=False,
                      index=False)
+
+
+if __name__ == "__main__":
+    predict_script()

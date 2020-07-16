@@ -28,9 +28,9 @@ def load_data(input_path='data/train_clean.csv', columns_Q='clean_txt', weight=F
 
 
 def gather_translations(input_path="data/train_with_translations_clean.csv",
-                        output_path="data/train_with_translations_clean_all_es_en_fr.csv",
+                        output_path="data/train_mock.csv",
                         option=None):
-    columns_t = ["clean_txt_T1", "clean_txt_T2_fr", "clean_txt_T3_pt", "clean_txt_T4_ar"]
+    columns_t = ["clean_txt_T1"]
 
     if option == "weight":
         df = pd.read_csv(input_path)
@@ -38,7 +38,7 @@ def gather_translations(input_path="data/train_with_translations_clean.csv",
         df0 = df[["clean_txt", "Intencion"]].copy()
         for col in columns_t:
             thr = df0["Intencion"].value_counts().values[0] // 2
-            cats_to_popu = [ k for k, v in dict(df0["Intencion"].value_counts()).items() if v < thr]
+            cats_to_popu = [k for k, v in dict(df0["Intencion"].value_counts()).items() if v < thr]
             print(f'Amount categories to populate : {len(cats_to_popu)}')
             df1 = df[df["Intencion"].isin(cats_to_popu)][[col, "Intencion"]].copy()
             df1.columns = ["clean_txt", "Intencion"]
