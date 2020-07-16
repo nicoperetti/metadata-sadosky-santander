@@ -1,27 +1,15 @@
-FROM ubuntu:18.04
-LABEL maintainer="Hugging Face"
-LABEL repository="transformers"
+FROM anibali/pytorch:1.5.0-cuda10.2
+USER root
 
-RUN apt update && \
-    apt install -y bash \
-                   build-essential \
-                   git \
-                   curl \
-                   wget \
-                   ca-certificates \
-                   python3 \
-                   python3-pip && \
-    rm -rf /var/lib/apt/lists
+RUN apt-get update && apt-get install build-essential -y
 
-RUN python3 -m pip install --no-cache-dir --upgrade pip && \
-    python3 -m pip install --no-cache-dir \
-    jupyter \
-    torch
-
-RUN pip3 install transformers[torch] pandas nltk textacy seaborn
-COPY . /meta
 WORKDIR /meta
-
 ENV PYTHONPATH /meta
+
+COPY requirements.txt .
+
+RUN pip install -r requirements.txt
+
+COPY . /meta
 
 CMD ["/bin/bash"]
