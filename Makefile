@@ -56,13 +56,13 @@ translate: translate_train translate_test
 ## Train
 train:
 	$(PYTHON_INTERPRETER) train.py \
-						--input_path "data/train_with_translation_clean.csv" \
+						--input_path "data/train_with_translations_clean.csv" \
 						--output_dir "transformer_out_dir/"
 
 ## Predict
 predict:
 	$(PYTHON_INTERPRETER) predict.py \
-						--input_path "data/test_with_translation_clean.csv" \
+						--input_path "data/test_with_translations_clean.csv" \
 						--output_dir "transformer_out_dir/" \
 						--tdd False
 
