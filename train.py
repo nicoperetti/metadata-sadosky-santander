@@ -136,7 +136,7 @@ def train(df, nb_class, output_model_file, output_vocab_file, validation, weight
 @click.option('--output_dir', type=click.STRING, help='Path to output dir')
 def train_script(input_path, output_dir):
     output_path = output_dir + "train_intermediate.csv"
-    gather_translations(input_path, output_path, option="weight")
+    gather_translations(input_path, output_path)
     df, encode_dict, nb_class, weight_list = load_data(input_path=output_path,
                                                        weight=True)
     json.dump(encode_dict, open(output_dir + "mapping.json", "w"))
